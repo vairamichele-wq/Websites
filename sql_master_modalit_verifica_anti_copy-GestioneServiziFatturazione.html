@@ -105,10 +105,10 @@
         }
     </style>
 </head>
-<body class="p-4" oncontextmenu="return false;">
+<body class="p-4 bg-slate-900" oncontextmenu="return false;">
 
-    <!-- ================= MODALE DI AVVIO VERIFICA ================= -->
-    <div id="start-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 modal-backdrop p-4">
+    <!-- ================= MODALE DI AVVIO VERIFICA (COMPLETAMENTE OPACO) ================= -->
+    <div id="start-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 text-center space-y-4">
             <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-3xl font-bold">
                 🔒
@@ -159,15 +159,15 @@
         </div>
     </div>
 
-    <!-- ================= MODALE DI AVVISO INFRAZIONE ================= -->
-    <div id="warning-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-amber-950/70 modal-backdrop p-4">
+    <!-- ================= MODALE DI AVVISO INFRAZIONE (COMPLETAMENTE OPACO) ================= -->
+    <div id="warning-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-amber-300 text-center space-y-4">
             <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">
                 ⚠️
             </div>
             <div>
                 <h3 class="text-xl font-black text-slate-900">Anomalia Rilevata!</h3>
-                <p id="warning-reason-text" class="text-xs text-slate-600 mt-1">Hai abbandonato la scheda della verifica.</p>
+                <p id="warning-reason-text" class="text-xs text-slate-600 mt-1">Hai abbandonato o riaperto la scheda della verifica.</p>
             </div>
             <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                 <span class="text-xs text-slate-500 block">Contatore Infrazioni:</span>
@@ -180,8 +180,8 @@
         </div>
     </div>
 
-    <!-- ================= MODALE DI BLOCCO DEFINITIVO ================= -->
-    <div id="lockout-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-red-950/90 modal-backdrop p-4">
+    <!-- ================= MODALE DI BLOCCO DEFINITIVO (COMPLETAMENTE OPACO) ================= -->
+    <div id="lockout-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-red-300 text-center space-y-5">
             <div class="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mx-auto text-3xl font-bold">
                 🚫
@@ -346,8 +346,8 @@
         </div>
     </div>
 
-    <!-- ================= CORPO PRINCIPALE DELL'APPLICAZIONE ================= -->
-    <div class="max-w-[1600px] mx-auto">
+    <!-- ================= CORPO PRINCIPALE DELL'APPLICAZIONE (NASCOSTO FINO ALL'AVVIO/RIPRISTINO) ================= -->
+    <div id="main-app-container" class="max-w-[1600px] mx-auto hidden bg-slate-50 min-h-screen p-4 rounded-2xl">
         <header class="mb-4 flex flex-col md:flex-row justify-between items-end border-b border-slate-200 pb-3 gap-3">
             <div>
                 <div class="flex items-center gap-2">
@@ -727,6 +727,7 @@
         const violationBadge = document.getElementById('violation-badge');
         const violationCountText = document.getElementById('violation-count-text');
         const violationLogList = document.getElementById('violation-log-list');
+        const mainAppContainer = document.getElementById('main-app-container');
 
         function convertToRawGithubUrl(url) {
             if (url.includes("github.com") && url.includes("/blob/")) {
@@ -786,13 +787,14 @@
                 violationCountText.innerText = `${violationCount} / ${MAX_VIOLATIONS}`;
 
                 if (isLocked || violationCount >= MAX_VIOLATIONS) {
+                    startModal.classList.add('hidden');
                     lockExam();
                     return true;
                 }
 
                 // Se la prova era già avviata ed è stata riaperta/ricaricata la pagina, si applica una penalità
                 startModal.classList.add('hidden');
-                recordViolation("Tentativo di ricaricamento / riapertura della pagina durante la prova in corso");
+                recordViolation("Tentativo di ricaricamento / riapertura della pagina da Classroom o browser");
 
                 return true;
 
@@ -855,6 +857,12 @@
             document.getElementById('locked-student-name').innerText = currentStudentName;
 
             startModal.classList.add('hidden');
+            mainAppContainer.classList.remove('hidden');
+            
+            if (editorCM) {
+                setTimeout(() => editorCM.refresh(), 50);
+            }
+
             saveExamStateToLocalStorage();
             
             if (document.documentElement.requestFullscreen) {
@@ -872,7 +880,7 @@
         }
 
         function recordViolation(reason) {
-            if (!examStarted || isLocked || isModalOpen) return;
+            if (!examStarted || isLocked) return;
 
             violationCount++;
             const now = new Date().toLocaleTimeString('it-IT');
@@ -897,6 +905,7 @@
 
         function showWarningModal(reason) {
             isModalOpen = true;
+            mainAppContainer.classList.add('hidden'); // Nasconde l'interfaccia principale dietro la schermata opaca
             warningReasonText.innerText = reason;
             warningCountDisplay.innerText = `${violationCount} / ${MAX_VIOLATIONS}`;
             warningModal.classList.remove('hidden');
@@ -905,6 +914,12 @@
         function dismissWarningModal() {
             isModalOpen = false;
             warningModal.classList.add('hidden');
+            mainAppContainer.classList.remove('hidden'); // Mostra l'interfaccia solo dopo l'esplicito click
+            
+            if (editorCM) {
+                setTimeout(() => editorCM.refresh(), 50);
+            }
+
             if (hasEnteredFullscreen && !document.fullscreenElement && document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen().catch(() => {});
             }
@@ -916,6 +931,7 @@
 
             warningModal.classList.add('hidden');
             startModal.classList.add('hidden');
+            mainAppContainer.classList.add('hidden'); // Assicura che l'interfaccia resti nascosta a schermo bloccato
             lockoutModal.classList.remove('hidden');
             
             violationLogList.innerHTML = violationLogs.map(log => `<div>• ${log}</div>`).join('');
@@ -943,11 +959,13 @@
                 saveExamStateToLocalStorage();
 
                 lockoutModal.classList.add('hidden');
+                mainAppContainer.classList.remove('hidden');
                 errText.classList.add('hidden');
                 pinInput.value = "";
                 
                 if (editorCM) {
                     editorCM.setOption("readOnly", false);
+                    setTimeout(() => editorCM.refresh(), 50);
                 }
                 runBtn.disabled = false;
                 runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -1071,6 +1089,7 @@
 
             if (editorCM) {
                 editorCM.setValue(q.userQuery || "");
+                setTimeout(() => editorCM.refresh(), 20);
                 editorCM.focus();
             }
 
