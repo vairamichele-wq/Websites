@@ -26,7 +26,7 @@
             background-color: #f8fafc; 
             color: #0f172a; 
             font-family: 'Inter', sans-serif;
-            user-select: none; /* Impedisce la selezione generica del testo per evitare copia non autorizzata */
+            user-select: none;
             -webkit-user-select: none;
         }
         .result-table th { background-color: #f1f5f9; color: #475569; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #e2e8f0; }
@@ -39,7 +39,7 @@
         .fk { color: #166534; font-weight: bold; background-color: #f0fdf4; border-radius: 2px; }
         .conn-line { stroke: #475569; stroke-width: 1.5; fill: none; opacity: 0.65; stroke-dasharray: 4 2; }
 
-        /* Stili CodeMirror Editor */
+        /* CodeMirror Editor */
         .CodeMirror {
             height: 180px;
             font-family: 'Fira Code', monospace;
@@ -53,7 +53,6 @@
             border-right: 1px solid #e2e8f0;
         }
 
-        /* Menu Popup Autocompletamento */
         .CodeMirror-hints {
             position: absolute;
             z-index: 100;
@@ -110,7 +109,7 @@
 
     <!-- ================= MODALE DI AVVIO VERIFICA ================= -->
     <div id="start-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 modal-backdrop p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 text-center space-y-5">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 text-center space-y-4">
             <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-3xl font-bold">
                 🔒
             </div>
@@ -120,18 +119,40 @@
                     Verifica Pratica di Informatica (Classe IV AFM) - SQL Gestione Servizi Bancari
                 </p>
             </div>
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-left text-xs text-amber-900 space-y-2">
-                <p class="font-bold flex items-center gap-2 text-amber-800">
+
+            <!-- Inserimento Dati Studente -->
+            <div class="text-left space-y-1">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Nome e Cognome Studente *</label>
+                <input type="text" id="start-student-name" placeholder="Es. Mario Rossi" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-indigo-600 focus:bg-white transition-all">
+                <p id="name-required-error" class="hidden text-[10px] text-red-600 font-bold">⚠️ Inserisci Nome e Cognome prima di iniziare!</p>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-left text-xs text-amber-900 space-y-1.5">
+                <p class="font-bold flex items-center gap-1.5 text-amber-800">
                     <span>⚠️</span> Regole di Sicurezza ed Anti-Cheating:
                 </p>
                 <ul class="list-disc pl-5 space-y-1 text-[11px] text-amber-800/90">
                     <li>La prova verrà eseguita a <strong>Schermo Intero</strong>.</li>
-                    <li><strong>È vietato aprire nuove schede</strong>, cambiare finestra o minimizzare il browser.</li>
-                    <li>Ogni tentativo di abbandono della pagina verrà registrato come <strong>Infrazione</strong>.</li>
+                    <li><strong>È vietato chiudere o cambiare scheda/finestra</strong>.</li>
+                    <li>Ricaricare la pagina o riaprire il link verrà registrato come <strong>Infrazione</strong>.</li>
                     <li>Dopo <strong>3 anomalie</strong> la verifica si bloccherà definitivamente.</li>
-                    <li>Le risposte vengono salvate <strong>automaticamente in tempo reale</strong>.</li>
+                    <li>I dati vengono salvati <strong>automaticamente in memoria locale</strong>.</li>
                 </ul>
             </div>
+
+            <!-- Avviso Incorporamento Google Sites / Iframe -->
+            <div id="iframe-warning-banner" class="hidden bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-left text-xs text-indigo-900 space-y-1.5">
+                <p class="font-bold text-indigo-900 flex items-center gap-1.5">
+                    <span>ℹ️</span> Incorporamento Google Sites Rilevato
+                </p>
+                <p class="text-[11px] text-indigo-800">
+                    I frame di Google Sites bloccano la modalità Schermo Intero. Per la massima protezione anti-copia, apri la verifica in una scheda dedicata:
+                </p>
+                <a href="javascript:void(0)" onclick="window.open(window.location.href, '_blank')" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider transition-colors mt-1">
+                    ↗️ Apri in una Nuova Scheda per Schermo Intero
+                </a>
+            </div>
+
             <button onclick="startExamSession()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl text-xs uppercase tracking-widest transition-all shadow-lg shadow-indigo-200 active:scale-95">
                 Inizia la Verifica Ora
             </button>
@@ -152,7 +173,7 @@
                 <span class="text-xs text-slate-500 block">Contatore Infrazioni:</span>
                 <span id="warning-count-display" class="text-2xl font-black text-amber-600">1 / 3</span>
             </div>
-            <p class="text-[10px] text-slate-400">Ritorna subito a schermo intero. Al terzo tentativo la prova verrà bloccata.</p>
+            <p class="text-[10px] text-slate-400">Ritorna subito alla prova. Al terzo tentativo la verifica si bloccherà.</p>
             <button onclick="dismissWarningModal()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-xs uppercase tracking-widest transition-all">
                 Ho Capito - Riprendi Prova
             </button>
@@ -168,6 +189,7 @@
             <div>
                 <h2 class="text-2xl font-black text-red-600">VERIFICA BLOCCATA</h2>
                 <p class="text-xs text-slate-600 mt-1">
+                    Studente: <strong id="locked-student-name" class="text-slate-900">--</strong><br>
                     È stato superato il limite massimo di anomalie consentite (3/3).
                 </p>
             </div>
@@ -177,12 +199,17 @@
                     <!-- Log inseriti via JS -->
                 </div>
             </div>
-            <p class="text-xs text-slate-500 italic">Richiedi l'intervento del Docente per lo sblocco della prova.</p>
+            <p class="text-xs text-slate-500 italic">Richiedi l'intervento del Docente per lo sblocco o il reset.</p>
             
-            <div class="pt-2 border-t border-slate-100 flex gap-2">
-                <input type="password" id="teacher-pin-input" placeholder="PIN Docente" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-center w-1/2 focus:outline-none focus:border-indigo-500">
-                <button onclick="unlockByTeacher()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl text-xs uppercase tracking-widest w-1/2 transition-all">
-                    Sblocca Docente
+            <div class="pt-2 border-t border-slate-100 space-y-2">
+                <div class="flex gap-2">
+                    <input type="password" id="teacher-pin-input" placeholder="PIN Docente" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-center w-1/2 focus:outline-none focus:border-indigo-500">
+                    <button onclick="unlockByTeacher()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-3 rounded-xl text-xs uppercase tracking-widest w-1/2 transition-all">
+                        Sblocca Docente
+                    </button>
+                </div>
+                <button onclick="resetExamByTeacher()" class="w-full bg-red-100 hover:bg-red-200 text-red-800 font-bold py-1.5 px-3 rounded-xl text-[10px] uppercase tracking-wider transition-all">
+                    ⚠️ Azzeramento Completo Prova (Reset)
                 </button>
             </div>
             <p id="pin-error-text" class="hidden text-[10px] text-red-600 font-bold">PIN Docente Errato!</p>
@@ -197,7 +224,6 @@
                 <button onclick="closeRubricModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
             </div>
 
-            <!-- Tabella Punteggi Quesiti -->
             <div>
                 <h4 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2">1. Ripartizione Punteggi per Quesito</h4>
                 <div class="overflow-x-auto border border-slate-200 rounded-xl">
@@ -311,7 +337,7 @@
         </div>
     </div>
 
-    <!-- ================= NOTIFICA TOAST ANTI-PASTE / AZIONI ================= -->
+    <!-- ================= NOTIFICA TOAST ================= -->
     <div id="toast-notification" class="hidden fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3 transition-all duration-300 transform translate-y-2 opacity-0">
         <span id="toast-icon" class="text-amber-400 font-bold text-base">🛑</span>
         <div>
@@ -329,6 +355,7 @@
                     <span class="text-xs font-bold text-slate-400">Verifica Pratica SQL</span>
                 </div>
                 <h1 class="text-xl font-black text-slate-900 mt-1">Gestione Servizi Bancari e Finanziamenti <span class="text-indigo-600">(Fila A/D)</span></h1>
+                <p id="header-student-display" class="text-xs font-bold text-indigo-800 mt-0.5 hidden">Studente: <span id="header-student-name">--</span></p>
             </div>
             
             <!-- Pulsanti ed Indicatori -->
@@ -558,11 +585,10 @@
                         <span>🔒</span> Modalità Sicura PC Condivisi:
                     </p>
                     <p class="text-indigo-800">
-                        Cliccando su <strong>"Copia Relazione negli Appunti"</strong> il testo formattato verrà copiato nella memoria temporanea. Potrai incollarlo direttamente (`Ctrl+V`) nel tuo <strong>Google Documento</strong> o nei commenti di consegna di <strong>Classroom</strong>. Nessun file rimane sul PC.
+                        Cliccando su <strong>"Copia Relazione negli Appunti"</strong> il testo formattato verrà copiato nella memoria temporanea. Potrai incollarlo direttamente (`Ctrl+V`) nel tuo <strong>Google Documento</strong> o nei commenti di consegna di <strong>Classroom</strong>.
                     </p>
                 </div>
 
-                <!-- Anteprima Testo Formattato -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Anteprima Relazione Formattata</label>
@@ -589,10 +615,25 @@
     <script>
         const GITHUB_DB_URL = "https://github.com/vairamichele-wq/Database/blob/main/Verifica6.db";
         const TEACHER_PIN = "1234"; // PIN per lo sblocco docente
+        const STORAGE_KEY = "SQL_EXAM_PERSISTENT_STATE_V1";
         
         let db;
         let editorCM;
         let schemaTables = {};
+
+        // Stato Fullscreen ed Incorporamento
+        let fullscreenSupported = false;
+        let hasEnteredFullscreen = false;
+
+        // Dati Studente e Sessione
+        let currentStudentName = "";
+
+        function checkIframeEnvironment() {
+            if (window.self !== window.top) {
+                const banner = document.getElementById('iframe-warning-banner');
+                if (banner) banner.classList.remove('hidden');
+            }
+        }
 
         // Struttura Dati dei 7 Quesiti della Verifica
         const questionsData = [
@@ -694,6 +735,81 @@
             return url;
         }
 
+        // ================= GESTIONE PERSISTENZA LOCALSTORAGE =================
+
+        function saveExamStateToLocalStorage() {
+            const state = {
+                studentName: currentStudentName,
+                examStarted: examStarted,
+                violationCount: violationCount,
+                isLocked: isLocked,
+                violationLogs: violationLogs,
+                queries: questionsData.map(q => q.userQuery)
+            };
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.warn("Impossibile salvare lo stato in LocalStorage:", e);
+            }
+        }
+
+        function restoreExamStateFromLocalStorage() {
+            try {
+                const savedRaw = localStorage.getItem(STORAGE_KEY);
+                if (!savedRaw) return false;
+
+                const state = JSON.parse(savedRaw);
+                if (!state || !state.examStarted) return false;
+
+                currentStudentName = state.studentName || "";
+                examStarted = state.examStarted;
+                violationCount = state.violationCount || 0;
+                isLocked = state.isLocked || false;
+                violationLogs = state.violationLogs || [];
+
+                if (Array.isArray(state.queries)) {
+                    state.queries.forEach((qText, i) => {
+                        if (questionsData[i]) {
+                            questionsData[i].userQuery = qText || "";
+                        }
+                    });
+                }
+
+                // Aggiorna Interfaccia
+                if (currentStudentName) {
+                    document.getElementById('header-student-name').innerText = currentStudentName;
+                    document.getElementById('header-student-display').classList.remove('hidden');
+                    document.getElementById('student-name-input').value = currentStudentName;
+                    document.getElementById('locked-student-name').innerText = currentStudentName;
+                }
+
+                violationCountText.innerText = `${violationCount} / ${MAX_VIOLATIONS}`;
+
+                if (isLocked || violationCount >= MAX_VIOLATIONS) {
+                    lockExam();
+                    return true;
+                }
+
+                // Se la prova era già avviata ed è stata riaperta/ricaricata la pagina, si applica una penalità
+                startModal.classList.add('hidden');
+                recordViolation("Tentativo di ricaricamento / riapertura della pagina durante la prova in corso");
+
+                return true;
+
+            } catch (e) {
+                console.error("Errore durante il ripristino dello stato da LocalStorage:", e);
+                return false;
+            }
+        }
+
+        function clearLocalStorageExam() {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (e) {
+                console.warn("Impossibile azzerare LocalStorage:", e);
+            }
+        }
+
         function showToast(message, icon = "🛑", title = "Azione Non Consentita") {
             const toast = document.getElementById('toast-notification');
             const toastIcon = document.getElementById('toast-icon');
@@ -719,14 +835,40 @@
         }
 
         function startExamSession() {
-            examStarted = true;
-            startModal.classList.add('hidden');
+            const nameInput = document.getElementById('start-student-name');
+            const errName = document.getElementById('name-required-error');
             
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {});
+            const nameVal = nameInput.value.trim();
+            if (!nameVal) {
+                errName.classList.remove('hidden');
+                nameInput.focus();
+                return;
             }
 
-            showToast("Verifica avviata in modalità protetta.", "🔒", "Verifica Avviata");
+            errName.classList.add('hidden');
+            currentStudentName = nameVal;
+            examStarted = true;
+
+            document.getElementById('header-student-name').innerText = currentStudentName;
+            document.getElementById('header-student-display').classList.remove('hidden');
+            document.getElementById('student-name-input').value = currentStudentName;
+            document.getElementById('locked-student-name').innerText = currentStudentName;
+
+            startModal.classList.add('hidden');
+            saveExamStateToLocalStorage();
+            
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen()
+                    .then(() => {
+                        hasEnteredFullscreen = true;
+                        fullscreenSupported = true;
+                        showToast("Verifica avviata in modalità protetta.", "🔒", "Verifica Avviata");
+                    })
+                    .catch((err) => {
+                        fullscreenSupported = false;
+                        showToast("Schermo intero limitato dal browser.", "⚠️", "Schermo Intero Limitato");
+                    });
+            }
         }
 
         function recordViolation(reason) {
@@ -742,6 +884,8 @@
             if (violationCount >= 1) {
                 violationBadge.className = "text-[10px] font-bold bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg text-amber-700 uppercase tracking-widest flex items-center gap-1.5 shadow-sm";
             }
+
+            saveExamStateToLocalStorage();
 
             if (violationCount >= MAX_VIOLATIONS) {
                 violationBadge.className = "text-[10px] font-bold bg-red-50 border border-red-200 px-3 py-1.5 rounded-lg text-red-700 uppercase tracking-widest flex items-center gap-1.5 shadow-sm";
@@ -761,14 +905,17 @@
         function dismissWarningModal() {
             isModalOpen = false;
             warningModal.classList.add('hidden');
-            if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+            if (hasEnteredFullscreen && !document.fullscreenElement && document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen().catch(() => {});
             }
         }
 
         function lockExam() {
             isLocked = true;
+            saveExamStateToLocalStorage();
+
             warningModal.classList.add('hidden');
+            startModal.classList.add('hidden');
             lockoutModal.classList.remove('hidden');
             
             violationLogList.innerHTML = violationLogs.map(log => `<div>• ${log}</div>`).join('');
@@ -793,6 +940,8 @@
                 violationCountText.innerText = `0 / ${MAX_VIOLATIONS}`;
                 violationBadge.className = "text-[10px] font-bold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg text-emerald-700 uppercase tracking-widest flex items-center gap-1.5 shadow-sm";
                 
+                saveExamStateToLocalStorage();
+
                 lockoutModal.classList.add('hidden');
                 errText.classList.add('hidden');
                 pinInput.value = "";
@@ -805,7 +954,7 @@
 
                 showToast("Verifica sbloccata dal Docente.", "🔓", "Sbloccato");
                 
-                if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+                if (hasEnteredFullscreen && !document.fullscreenElement && document.documentElement.requestFullscreen) {
                     document.documentElement.requestFullscreen().catch(() => {});
                 }
             } else {
@@ -813,7 +962,29 @@
             }
         }
 
+        function resetExamByTeacher() {
+            const pinInput = document.getElementById('teacher-pin-input');
+            const errText = document.getElementById('pin-error-text');
+
+            if (pinInput.value === TEACHER_PIN) {
+                if (confirm("Sei sicuro di voler resettare completamente la prova per questo studente? Tutti i salvataggi verranno cancellati.")) {
+                    clearLocalStorageExam();
+                    window.location.reload();
+                }
+            } else {
+                errText.classList.remove('hidden');
+            }
+        }
+
         // ================= SICUREZZA ED EVENTI =================
+
+        window.addEventListener('beforeunload', function(e) {
+            if (examStarted && !isLocked) {
+                e.preventDefault();
+                e.returnValue = 'La verifica è in corso. Se lasci la pagina verrai penalizzato!';
+                return e.returnValue;
+            }
+        });
 
         document.addEventListener('visibilitychange', function() {
             if (document.hidden && examStarted && !isLocked) {
@@ -828,7 +999,9 @@
         });
 
         document.addEventListener('fullscreenchange', function() {
-            if (!document.fullscreenElement && examStarted && !isLocked && !isModalOpen) {
+            if (document.fullscreenElement) {
+                hasEnteredFullscreen = true;
+            } else if (!document.fullscreenElement && examStarted && !isLocked && !isModalOpen && hasEnteredFullscreen) {
                 recordViolation("Disattivazione della modalità Schermo Intero");
             }
         });
@@ -967,13 +1140,12 @@
             document.getElementById('summary-modal').classList.add('hidden');
         }
 
-        // ================= GESTIONE CONSEGNA SENZA DOWNLOAD (COPY TO CLIPBOARD) =================
+        // ================= GESTIONE CONSEGNA SENZA DOWNLOAD =================
 
         function openExportModal() {
             isModalOpen = true;
             document.getElementById('export-modal').classList.remove('hidden');
             updateReportPreview();
-            document.getElementById('student-name-input').focus();
         }
 
         function closeExportModal() {
@@ -1041,7 +1213,6 @@
                 showToast("Relazione copiata negli appunti! Incollala in Google Docs.", "📋", "Copiato con Successo");
                 closeExportModal();
             } catch (err) {
-                // Fallback nel caso la Clipboard API blocchi la scrittura
                 const previewBox = document.getElementById('report-preview-box');
                 const range = document.createRange();
                 range.selectNodeContents(previewBox);
@@ -1078,12 +1249,12 @@
                 }
             });
 
-            // Auto-Save in tempo reale ad ogni digitazione
             editorCM.on("change", function(cm) {
                 if (!isLocked) {
                     questionsData[currentQuesitoIndex].userQuery = cm.getValue();
                     updateSavedStatusBadge();
                     renderQuestionTabs();
+                    saveExamStateToLocalStorage();
                 }
             });
 
@@ -1222,6 +1393,10 @@
         async function loadDatabaseFromGitHub() {
             try {
                 initCodeMirror();
+
+                // Tenta il ripristino dello stato precedente dal LocalStorage
+                restoreExamStateFromLocalStorage();
+
                 renderQuestionTabs();
 
                 statusText.innerText = "CARICAMENTO SQL.JS...";
@@ -1326,6 +1501,7 @@
         runBtn.addEventListener('click', runQuery);
         
         window.onload = function() {
+            checkIframeEnvironment();
             loadDatabaseFromGitHub();
         };
     </script>
