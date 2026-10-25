@@ -23,7 +23,7 @@
     
     <style>
         body { 
-            background-color: #f8fafc; 
+            background-color: #020617; 
             color: #0f172a; 
             font-family: 'Inter', sans-serif;
             user-select: none;
@@ -105,7 +105,7 @@
         }
     </style>
 </head>
-<body class="p-4 bg-slate-900" oncontextmenu="return false;">
+<body class="p-4 bg-slate-950 min-h-screen" oncontextmenu="return false;">
 
     <!-- ================= MODALE DI AVVIO VERIFICA (COMPLETAMENTE OPACO) ================= -->
     <div id="start-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
@@ -167,15 +167,15 @@
             </div>
             <div>
                 <h3 class="text-xl font-black text-slate-900">Anomalia Rilevata!</h3>
-                <p id="warning-reason-text" class="text-xs text-slate-600 mt-1">Hai abbandonato o riaperto la scheda della verifica.</p>
+                <p id="warning-reason-text" class="text-xs text-slate-600 mt-1">Hai abbandonato, riaperto la scheda o disattivato lo Schermo Intero.</p>
             </div>
             <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                 <span class="text-xs text-slate-500 block">Contatore Infrazioni:</span>
                 <span id="warning-count-display" class="text-2xl font-black text-amber-600">1 / 3</span>
             </div>
-            <p class="text-[10px] text-slate-400">Ritorna subito alla prova. Al terzo tentativo la verifica si bloccherà.</p>
-            <button onclick="dismissWarningModal()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-xs uppercase tracking-widest transition-all">
-                Ho Capito - Riprendi Prova
+            <p class="text-[11px] text-slate-500 font-medium">Clicca sul pulsante sottostante per <strong>riattivare lo Schermo Intero</strong> e riprendere la verifica.</p>
+            <button onclick="dismissWarningModal()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 px-4 rounded-xl text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-200">
+                <span>🔒</span> Ho Capito - Ripristina Schermo Intero e Prosegui
             </button>
         </div>
     </div>
@@ -347,7 +347,7 @@
     </div>
 
     <!-- ================= CORPO PRINCIPALE DELL'APPLICAZIONE (NASCOSTO FINO ALL'AVVIO/RIPRISTINO) ================= -->
-    <div id="main-app-container" class="max-w-[1600px] mx-auto hidden bg-slate-50 min-h-screen p-4 rounded-2xl">
+    <div id="main-app-container" class="max-w-[1600px] mx-auto hidden bg-slate-50 min-h-screen p-4 rounded-2xl shadow-2xl">
         <header class="mb-4 flex flex-col md:flex-row justify-between items-end border-b border-slate-200 pb-3 gap-3">
             <div>
                 <div class="flex items-center gap-2">
@@ -621,10 +621,6 @@
         let editorCM;
         let schemaTables = {};
 
-        // Stato Fullscreen ed Incorporamento
-        let fullscreenSupported = false;
-        let hasEnteredFullscreen = false;
-
         // Dati Studente e Sessione
         let currentStudentName = "";
 
@@ -788,13 +784,15 @@
 
                 if (isLocked || violationCount >= MAX_VIOLATIONS) {
                     startModal.classList.add('hidden');
+                    mainAppContainer.classList.add('hidden');
                     lockExam();
                     return true;
                 }
 
                 // Se la prova era già avviata ed è stata riaperta/ricaricata la pagina, si applica una penalità
                 startModal.classList.add('hidden');
-                recordViolation("Tentativo di ricaricamento / riapertura della pagina da Classroom o browser");
+                mainAppContainer.classList.add('hidden'); // Nasconde tassativamente il contenuto
+                recordViolation("Riapertura / ricaricamento della scheda durante la verifica");
 
                 return true;
 
@@ -857,26 +855,25 @@
             document.getElementById('locked-student-name').innerText = currentStudentName;
 
             startModal.classList.add('hidden');
-            mainAppContainer.classList.remove('hidden');
             
-            if (editorCM) {
-                setTimeout(() => editorCM.refresh(), 50);
-            }
-
-            saveExamStateToLocalStorage();
-            
+            // Attiva Schermo Intero
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen()
                     .then(() => {
-                        hasEnteredFullscreen = true;
-                        fullscreenSupported = true;
                         showToast("Verifica avviata in modalità protetta.", "🔒", "Verifica Avviata");
                     })
                     .catch((err) => {
-                        fullscreenSupported = false;
                         showToast("Schermo intero limitato dal browser.", "⚠️", "Schermo Intero Limitato");
                     });
             }
+
+            mainAppContainer.classList.remove('hidden');
+            
+            if (editorCM) {
+                setTimeout(() => editorCM.refresh(), 100);
+            }
+
+            saveExamStateToLocalStorage();
         }
 
         function recordViolation(reason) {
@@ -905,7 +902,7 @@
 
         function showWarningModal(reason) {
             isModalOpen = true;
-            mainAppContainer.classList.add('hidden'); // Nasconde l'interfaccia principale dietro la schermata opaca
+            mainAppContainer.classList.add('hidden'); // Assicura che l'interfaccia sia completamente nascosta
             warningReasonText.innerText = reason;
             warningCountDisplay.innerText = `${violationCount} / ${MAX_VIOLATIONS}`;
             warningModal.classList.remove('hidden');
@@ -914,14 +911,16 @@
         function dismissWarningModal() {
             isModalOpen = false;
             warningModal.classList.add('hidden');
-            mainAppContainer.classList.remove('hidden'); // Mostra l'interfaccia solo dopo l'esplicito click
             
-            if (editorCM) {
-                setTimeout(() => editorCM.refresh(), 50);
+            // Forzatura sempre attiva del fullscreen alla pressione del pulsante
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
             }
 
-            if (hasEnteredFullscreen && !document.fullscreenElement && document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {});
+            mainAppContainer.classList.remove('hidden'); // Rivela l'interfaccia solo dopo la riattivazione
+            
+            if (editorCM) {
+                setTimeout(() => editorCM.refresh(), 100);
             }
         }
 
@@ -931,7 +930,7 @@
 
             warningModal.classList.add('hidden');
             startModal.classList.add('hidden');
-            mainAppContainer.classList.add('hidden'); // Assicura che l'interfaccia resti nascosta a schermo bloccato
+            mainAppContainer.classList.add('hidden'); // Interfaccia totalmente nascosta
             lockoutModal.classList.remove('hidden');
             
             violationLogList.innerHTML = violationLogs.map(log => `<div>• ${log}</div>`).join('');
@@ -959,22 +958,23 @@
                 saveExamStateToLocalStorage();
 
                 lockoutModal.classList.add('hidden');
+                
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                }
+
                 mainAppContainer.classList.remove('hidden');
                 errText.classList.add('hidden');
                 pinInput.value = "";
                 
                 if (editorCM) {
                     editorCM.setOption("readOnly", false);
-                    setTimeout(() => editorCM.refresh(), 50);
+                    setTimeout(() => editorCM.refresh(), 100);
                 }
                 runBtn.disabled = false;
                 runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 
                 showToast("Verifica sbloccata dal Docente.", "🔓", "Sbloccato");
-                
-                if (hasEnteredFullscreen && !document.fullscreenElement && document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                }
             } else {
                 errText.classList.remove('hidden');
             }
@@ -1011,15 +1011,13 @@
         });
 
         window.addEventListener('blur', function() {
-            if (examStarted && !isLocked) {
-                recordViolation("Perdita di focus dalla pagina della verifica");
+            if (examStarted && !isLocked && !isModalOpen) {
+                recordViolation("Perdita di focus dalla finestra della verifica");
             }
         });
 
         document.addEventListener('fullscreenchange', function() {
-            if (document.fullscreenElement) {
-                hasEnteredFullscreen = true;
-            } else if (!document.fullscreenElement && examStarted && !isLocked && !isModalOpen && hasEnteredFullscreen) {
+            if (!document.fullscreenElement && examStarted && !isLocked && !isModalOpen) {
                 recordViolation("Disattivazione della modalità Schermo Intero");
             }
         });
