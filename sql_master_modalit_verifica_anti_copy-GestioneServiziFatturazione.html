@@ -615,7 +615,18 @@
     <script>
         const GITHUB_DB_URL = "https://github.com/vairamichele-wq/Database/blob/main/Verifica6.db";
         const TEACHER_PIN = "1234"; // PIN per lo sblocco docente
-        const STORAGE_KEY = "SQL_EXAM_PERSISTENT_STATE_V1";
+        
+        // ================= GESTIONE SESSIONE / CLASSE =================
+        // Modifica questa stringa per cambiare sessione/classe a livello di codice, 
+        // oppure invia agli studenti un link con ?sessione=NOME_CLASSE
+        const DEFAULT_EXAM_SESSION_ID = "4AFM_VERIFICA_1"; 
+
+        // Rileva automaticamente l'ID sessione dall'URL (es. ...index.html?sessione=4BFM) oppure usa il default
+        const urlParams = new URLSearchParams(window.location.search);
+        const CURRENT_SESSION_ID = urlParams.get('sessione') || urlParams.get('session') || DEFAULT_EXAM_SESSION_ID;
+
+        // La chiave di memoria locale dipenderà unicamente dalla sessione corrente
+        const STORAGE_KEY = `SQL_EXAM_PERSISTENT_STATE_${CURRENT_SESSION_ID.toUpperCase()}`;
         
         let db;
         let editorCM;
@@ -860,7 +871,7 @@
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen()
                     .then(() => {
-                        showToast("Verifica avviata in modalità protetta.", "🔒", "Verifica Avviata");
+                        showToast(`Sessione ${CURRENT_SESSION_ID} avviata in modalità protetta.`, "🔒", "Verifica Avviata");
                     })
                     .catch((err) => {
                         showToast("Schermo intero limitato dal browser.", "⚠️", "Schermo Intero Limitato");
