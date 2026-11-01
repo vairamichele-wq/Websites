@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Safe Exam Viewer - Google Sheets</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body, html { width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; color: #f8fafc; }
+    
+    /* Header Bar */
+    #header-bar {
+      height: 60px;
+      background-color: #1e293b;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 100;
+      position: relative;
+    }
+    
+    .file-info { display: flex; align-items: center; gap: 12px; }
+    .file-title { font-weight: 600; font-size: 16px; color: #f8fafc; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .badge-original { background-color: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+    .badge-copy { background-color: #14532d; color: #86efac; border: 1px solid #22c55e; }
+    
+    .actions { display: flex; align-items: center; gap: 10px; }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary { background-color: #2563eb; color: white; }
+    .btn-primary:hover { background-color: #1d4ed8; }
+    .btn-success { background-color: #16a34a; color: white; }
+    .btn-success:hover { background-color: #15803d; }
+    .btn-warning { background-color: #d97706; color: white; }
+    .btn-warning:hover { background-color: #b45309; }
+    .btn-secondary { background-color: #475569; color: white; }
+    .btn-secondary:hover { background-color: #334155; }
+    
+    /* Main Content */
+    #main-container { width: 100%; height: calc(100vh - 60px); position: relative; }
+    iframe { width: 100%; height: 100%; border: none; background-color: #ffffff; }
+    
+    /* Start Overlay */
+    #start-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+    .start-card {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .start-card h2 { margin-bottom: 10px; color: #38bdf8; font-size: 22px; }
+    .start-card p { font-size: 14px; color: #94a3b8; margin-bottom: 20px; line-height: 1.5; }
+    .input-group { margin-bottom: 20px; }
+    .input-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #cbd5e1; }
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background-color: #0f172a;
+      color: white;
+      font-size: 14px;
+    }
+    
+    /* Modals */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 550px;
+      width: 90%;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .modal-header h3 { font-size: 18px; color: #f8fafc; }
+    .close-btn { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; }
+    .warning-box {
+      background-color: #451a03;
+      border: 1px solid #b45309;
+      color: #fcd34d;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Bar -->
+  <div id="header-bar">
+    <div class="file-info">
+      <span class="file-title" id="display-filename">Verifica Google Sheets</span>
+      <span class="badge badge-original" id="status-badge">🔒 Originale (Sola Lettura)</span>
+    </div>
+    <div class="actions">
+      <button class="btn btn-warning" onclick="openModal('settings-modal')">⚙️ Imposta Link</button>
+      <button class="btn btn-success" id="btn-consegna" onclick="consegnaVerifica()" style="display:none;">✅ Consegna e Esci</button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div id="main-container">
+    <iframe id="sheet-iframe" src="about:blank"></iframe>
+
+    <!-- Start Overlay -->
+    <div id="start-overlay">
+      <div class="start-card">
+        <h2>🛡️ Safe Exam Viewer</h2>
+        <p>Inserisci il tuo nome per accedere alla modalità protetta a schermo intero.</p>
+        <div class="input-group">
+          <label>NOME E COGNOME STUDENTE</label>
+          <input type="text" id="student-name" placeholder="Es. Mario Rossi">
+        </div>
+        <button class="btn btn-primary" style="width: 100%; padding: 12px; justify-content: center;" onclick="startExam()">
+          🚀 Avvia Modalità Protetta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal (Imposta Link per Docente) -->
+  <div class="modal" id="settings-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>⚙️ Imposta Link Verifica (Docente)</h3>
+        <button class="close-btn" onclick="closeModal('settings-modal')">&times;</button>
+      </div>
+      <div class="input-group">
+        <label>URL FOGLIO GOOGLE DI PARTENZA (ORIGINALE)</label>
+        <input type="text" id="master-url-input" placeholder="https://docs.google.com/spreadsheets/d/...">
+      </div>
+      <button class="btn btn-primary" style="width: 100%; margin-bottom: 20px;" onclick="saveMasterUrl()">Salva Foglio Master</button>
+      
+      <div style="border-top: 1px solid #334155; padding-top: 15px;">
+        <label style="font-size: 12px; font-weight: 600; color: #38bdf8;">🏫 LINK PRONTO PER GOOGLE CLASSROOM</label>
+        <p style="font-size: 12px; color: #94a3b8; margin: 5px 0 10px 0;">Copia questo link e incollalo nei compiti di Classroom:</p>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="classroom-link-output" readonly style="flex: 1; background-color: #0f172a; border: 1px solid #475569; color: #f8fafc; padding: 8px; border-radius: 6px; font-size: 12px;">
+          <button class="btn btn-secondary" onclick="copyClassroomLink()">📋 Copia</button>
+        </div>
+        <div id="local-file-warning" class="warning-box" style="display:none;">
+          ⚠️ <strong>Stai aprendo il file in locale (file:///)</strong>.<br>
+          Google Classroom accetta solo link che iniziano con <code>https://</code>. Per usare il link diretto, carica prima questo file HTML su un server web o su GitHub Pages, oppure allegalo come <strong>File</strong> al compito su Classroom.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/1nGckMmwy17gbewXfE-knkcUzlAdr1wDNSFD5g1Kzpkw/edit?gid=685945149#gid=685945149";
+    let currentSheetUrl = DEFAULT_SHEET_URL;
+
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sheetParam = urlParams.get('sheet') || urlParams.get('url');
+      if (sheetParam) {
+        currentSheetUrl = sheetParam;
+      }
+      document.getElementById('master-url-input').value = currentSheetUrl;
+      updateClassroomLink();
+      loadIframe(currentSheetUrl);
+    };
+
+    function getEmbedUrl(url) {
+      if (!url) return '';
+      let cleanUrl = url.replace(/\/copy.*$/, '/edit').replace(/\/edit.*$/, '/edit');
+      return cleanUrl + '?rm=embedded';
+    }
+
+    function loadIframe(url) {
+      const iframe = document.getElementById('sheet-iframe');
+      iframe.src = getEmbedUrl(url);
+    }
+
+    function startExam() {
+      const name = document.getElementById('student-name').value.trim();
+      if (!name) {
+        alert("Inserisci Nome e Cognome prima di iniziare.");
+        return;
+      }
+
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      }
+
+      document.getElementById('start-overlay').style.display = 'none';
+      document.getElementById('btn-consegna').style.display = 'inline-flex';
+
+      let copyUrl = currentSheetUrl.replace(/\/edit.*$/, '/copy');
+      window.open(copyUrl, '_blank');
+      
+      const badge = document.getElementById('status-badge');
+      badge.className = "badge badge-copy";
+      badge.innerText = "✏️ Tua Copia Modificabile";
+    }
+
+    function consegnaVerifica() {
+      if (confirm("Vuoi confermare la consegna ed uscire dalla verifica?")) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+        alert("Verifica Consegnata con successo!");
+        location.reload();
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function saveMasterUrl() {
+      const val = document.getElementById('master-url-input').value.trim();
+      if (val) {
+        currentSheetUrl = val;
+        loadIframe(val);
+        updateClassroomLink();
+        closeModal('settings-modal');
+      }
+    }
+
+    function updateClassroomLink() {
+      const isLocal = window.location.protocol === 'file:';
+      const warningBox = document.getElementById('local-file-warning');
+      
+      if (isLocal) {
+        warningBox.style.display = 'block';
+        document.getElementById('classroom-link-output').value = "File in locale - Pubblica l'HTML online o allegalo come File";
+      } else {
+        warningBox.style.display = 'none';
+        const baseUrl = window.location.href.split('?')[0];
+        document.getElementById('classroom-link-output').value = baseUrl + "?sheet=" + encodeURIComponent(currentSheetUrl);
+      }
+    }
+
+    function copyClassroomLink() {
+      if (window.location.protocol === 'file:') {
+        alert("Non puoi inserire un link locale (file:///) su Google Classroom. Carica prima il file HTML online (es. GitHub Pages) o allegalo come File su Classroom!");
+        return;
+      }
+      const input = document.getElementById('classroom-link-output');
+      input.select();
+      document.execCommand('copy');
+      alert("Link per Google Classroom copiato negli appunti!");
+    }
+  </script>
+</body>
+</html>
