@@ -127,6 +127,16 @@
         const MAX_VIOLATIONS = 3;
 
         window.onload = function() {
+            // Forza l'uscita da iframe/contenitori Google per sbloccare l'API del tasto ESC
+            if (window.self !== window.top) {
+                try {
+                    window.top.location.href = window.location.href;
+                    return;
+                } catch (e) {
+                    console.warn("Impossibile effettuare il breakout automatico:", e);
+                }
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const sheetParam = urlParams.get('sheet') || urlParams.get('url');
             if (sheetParam) {
