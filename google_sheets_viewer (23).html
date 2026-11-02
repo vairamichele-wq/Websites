@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe Exam Viewer - Google Sheets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background-color: #020617; 
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow: hidden;
+        }
+        .modal-backdrop { backdrop-filter: blur(10px); }
+        .sheet-container { height: calc(100vh - 60px); width: 100%; }
+    </style>
+</head>
+<body class="bg-slate-950 min-h-screen flex flex-col font-sans" oncontextmenu="return false;">
+
+    <!-- ================= SCHERMATA INIZIALE AUTOMATICA ================= -->
+    <div id="setup-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-4 overflow-y-auto">
+        <div class="bg-slate-900 rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-800 space-y-6 text-slate-100">
+            
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center text-2xl border border-emerald-500/30 font-bold">
+                    📊
+                </div>
+                <div>
+                    <h2 class="text-xl font-black text-white">Safe Exam Viewer</h2>
+                    <p class="text-xs text-slate-400">Verifica di Informatica / Calcolo</p>
+                </div>
+            </div>
+
+            <!-- Dati Studente -->
+            <div class="space-y-2 text-left">
+                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Nome e Cognome Studente *</label>
+                <input type="text" id="student-name-input" placeholder="Es. Mario Rossi" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white font-semibold focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
+                <p id="name-error" class="hidden text-[11px] text-rose-400 font-bold">⚠️ Inserisci Nome e Cognome prima di iniziare.</p>
+            </div>
+
+            <!-- Messaggio di Stato del Foglio -->
+            <div id="ready-status-box" class="bg-emerald-950/50 border border-emerald-800/80 rounded-2xl p-4 flex items-center gap-3">
+                <span class="text-2xl">✅</span>
+                <div class="text-xs">
+                    <p class="font-extrabold text-emerald-400 uppercase tracking-wider">Copia Personale Pronta</p>
+                    <p class="text-slate-300 text-[11px] mt-0.5">Il tuo foglio personale è stato creato e collegato automaticamente.</p>
+                </div>
+            </div>
+
+            <!-- Avvio Prova -->
+            <button onclick="launchExamProtection()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 px-6 rounded-2xl text-xs uppercase tracking-widest transition-all shadow-xl shadow-emerald-950 active:scale-95 flex items-center justify-center gap-2">
+                <span>🚀</span> AVVIA MODALITÀ PROTETTA E INIZIA PROVA
+            </button>
+            
+            <p class="text-[10px] text-center text-slate-500">
+                La modalità protetta attiverà lo <strong>Schermo Intero</strong> e il monitoraggio anti-cheating.
+            </p>
+        </div>
+    </div>
+
+    <!-- ================= APPLICAZIONE A SCHERMO INTERO ================= -->
+    <div id="main-app-container" class="w-full h-screen hidden flex flex-col bg-slate-950">
+        
+        <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-md">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-base border border-emerald-500/30">
+                    📊
+                </div>
+                <div>
+                    <h1 class="text-sm font-black text-white flex items-center gap-2">
+                        <span>Verifica Google Sheets</span>
+                        <span class="bg-emerald-950 text-emerald-400 text-[9px] font-extrabold px-2 py-0.5 rounded border border-emerald-800/60 uppercase">✏️ Copia Personale Modificabile</span>
+                    </h1>
+                    <p class="text-[11px] font-semibold text-slate-400 mt-0.5">
+                        Candidato: <span id="header-student-name" class="text-emerald-400 font-bold">--</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div id="violation-badge" class="text-[10px] font-bold bg-emerald-950 border border-emerald-800 px-3 py-1.5 rounded-xl text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>⚠️ Anomalie:</span>
+                    <span id="violation-count-text" class="font-black">0 / 3</span>
+                </div>
+
+                <button onclick="consegnaVerifica()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-colors shadow-lg shadow-emerald-950 active:scale-95 uppercase tracking-wider">
+                    ✅ Consegna e Esci
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 w-full bg-slate-950 relative overflow-hidden sheet-container">
+            <iframe id="google-sheet-frame" class="w-full h-full border-0 bg-white" src="about:blank" allowfullscreen="true"></iframe>
+        </main>
+    </div>
+
+    <!-- Modale Anomalie -->
+    <div id="warning-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 modal-backdrop p-4">
+        <div class="bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-amber-500/50 text-center space-y-4 text-slate-100">
+            <div class="w-14 h-14 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold border border-amber-500/30">⚠️</div>
+            <div>
+                <h3 class="text-xl font-black text-white">Anomalia Rilevata!</h3>
+                <p id="warning-reason-text" class="text-xs text-slate-400 mt-1">Hai abbandonato lo Schermo Intero o cambiato finestra.</p>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 p-3 rounded-2xl">
+                <span class="text-xs text-slate-400 block">Contatore Infrazioni:</span>
+                <span id="warning-count-display" class="text-2xl font-black text-amber-400">1 / 3</span>
+            </div>
+            <button onclick="dismissWarningModal()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3.5 px-4 rounded-xl text-xs uppercase tracking-widest transition-all">
+                🔒 Ripristina Schermo Intero
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentSheetUrl = "";
+        let currentStudentName = "";
+        let isExamActive = false;
+        let violationCount = 0;
+        const MAX_VIOLATIONS = 3;
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sheetParam = urlParams.get('sheet') || urlParams.get('url');
+            if (sheetParam) {
+                currentSheetUrl = decodeURIComponent(sheetParam);
+            }
+        };
+
+        function launchExamProtection() {
+            const nameInput = document.getElementById('student-name-input');
+            const nameErr = document.getElementById('name-error');
+
+            const nameVal = nameInput.value.trim();
+            if (!nameVal) {
+                nameErr.classList.remove('hidden');
+                nameInput.focus();
+                return;
+            }
+            nameErr.classList.add('hidden');
+            currentStudentName = nameVal;
+
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+
+            document.getElementById('setup-overlay').classList.add('hidden');
+            document.getElementById('main-app-container').classList.remove('hidden');
+            document.getElementById('header-student-name').innerText = currentStudentName;
+
+            loadIframe(currentSheetUrl);
+            isExamActive = true;
+        }
+
+        function getEmbedUrl(url) {
+            if (!url) return 'about:blank';
+            let cleanUrl = url.replace(/\/copy.*$/, '/edit').replace(/\/edit.*$/, '/edit');
+            return cleanUrl + '?rm=embedded';
+        }
+
+        function loadIframe(url) {
+            document.getElementById('google-sheet-frame').src = getEmbedUrl(url);
+        }
+
+        // Anti-cheating
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && isExamActive) recordViolation("Cambio scheda o finestra minimizzata");
+        });
+
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement && isExamActive) recordViolation("Uscita non autorizzata da Schermo Intero");
+        });
+
+        function recordViolation(reason) {
+            violationCount++;
+            document.getElementById('violation-count-text').innerText = `${violationCount} / ${MAX_VIOLATIONS}`;
+            document.getElementById('warning-reason-text').innerText = reason;
+            document.getElementById('warning-count-display').innerText = `${violationCount} / ${MAX_VIOLATIONS}`;
+            document.getElementById('warning-modal').classList.remove('hidden');
+        }
+
+        function dismissWarningModal() {
+            document.getElementById('warning-modal').classList.add('hidden');
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+        }
+
+        function consegnaVerifica() {
+            if (confirm("Vuoi consegnare ed uscire dalla modalità protetta?")) {
+                isExamActive = false;
+                if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+                alert("Verifica consegnata con successo!");
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
