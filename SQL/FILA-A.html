@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Master - Database Gestione Finanziamenti e Consulenti (Modalità Verifica Protetta)</title>
+    <title>SQL Master - Database Gestione Fatturazione (Modalità Verifica Protetta)</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -30,8 +30,8 @@
             -webkit-user-select: none;
         }
         .result-table th { background-color: #f1f5f9; color: #475569; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #e2e8f0; }
-        .schema-diagram { position: relative; background: #ffffff; border-radius: 0.75rem; height: 500px; overflow: hidden; border: 1px solid #e2e8f0; background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px); background-size: 15px 15px; }
-        .table-node { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 0.4rem; width: 175px; font-size: 0.65rem; position: absolute; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); z-index: 10; }
+        .schema-diagram { position: relative; background: #ffffff; border-radius: 0.75rem; height: 530px; overflow: hidden; border: 1px solid #e2e8f0; background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px); background-size: 15px 15px; }
+        .table-node { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 0.4rem; width: 185px; font-size: 0.65rem; position: absolute; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); z-index: 10; }
         .table-header { background: #1e3a8a; padding: 0.35rem; font-weight: 800; color: #f8fafc; border-radius: 0.3rem 0.3rem 0 0; text-align: center; letter-spacing: 0.05em; }
         .table-body { padding: 0.3rem; display: flex; flex-direction: column; gap: 1px; }
         .column { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px; }
@@ -111,12 +111,12 @@
     <div id="start-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 text-center space-y-4">
             <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-3xl font-bold">
-                🔒
+                🧾
             </div>
             <div>
                 <h2 class="text-2xl font-black text-slate-900">Modalità Verifica Protetta</h2>
                 <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Verifica Pratica di Informatica (Classe IV AFM) - SQL Gestione Servizi Bancari
+                    Prova Pratica / Laboratorio - SQL Gestione Fatturazione (Classe IV AFM - Fila A)
                 </p>
             </div>
 
@@ -220,10 +220,11 @@
     <div id="rubric-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 modal-backdrop p-4">
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-slate-200 space-y-5">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 class="text-lg font-black text-slate-900">Scheda Analitica e Griglia di Valutazione</h3>
+                <h3 class="text-lg font-black text-slate-900">Scheda Analitica e Griglia di Valutazione (Fila A)</h3>
                 <button onclick="closeRubricModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
             </div>
 
+            <!-- Tabella Ripartizione Punteggi -->
             <div>
                 <h4 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2">1. Ripartizione Punteggi per Quesito</h4>
                 <div class="overflow-x-auto border border-slate-200 rounded-xl">
@@ -241,59 +242,43 @@
                         <tbody class="divide-y divide-slate-100 text-slate-600">
                             <tr>
                                 <td class="p-2.5 font-bold text-slate-800">Quesito 1</td>
-                                <td class="p-2.5">Base-Intermedio (JOIN 2 Tab)</td>
-                                <td class="p-2.5 text-center font-mono">0,4 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,4 pt</td>
+                                <td class="p-2.5">Base-Intermedio (JOIN 2 Tab con Filtro e Ordinamento)</td>
+                                <td class="p-2.5 text-center font-mono">0,7 pt</td>
+                                <td class="p-2.5 text-center font-mono">0,6 pt</td>
                                 <td class="p-2.5 text-center font-mono">0,2 pt</td>
-                                <td class="p-2.5 text-right font-bold text-indigo-600">1,0 pt</td>
+                                <td class="p-2.5 text-right font-bold text-indigo-600">1,5 pt</td>
                             </tr>
                             <tr>
                                 <td class="p-2.5 font-bold text-slate-800">Quesito 2</td>
-                                <td class="p-2.5">Intermedio (LEFT JOIN - Clienti Senza Finanziamenti)</td>
-                                <td class="p-2.5 text-center font-mono">0,5 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,5 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,2 pt</td>
-                                <td class="p-2.5 text-right font-bold text-indigo-600">1,2 pt</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 font-bold text-slate-800">Quesito 3</td>
-                                <td class="p-2.5">Intermedio-Avanzato (JOIN 3 Tab con Range e Città)</td>
-                                <td class="p-2.5 text-center font-mono">0,6 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,6 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,3 pt</td>
-                                <td class="p-2.5 text-right font-bold text-indigo-600">1,5 pt</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 font-bold text-slate-800">Quesito 4</td>
-                                <td class="p-2.5">Intermedio (LEFT JOIN Filiali e Valori Nulli)</td>
-                                <td class="p-2.5 text-center font-mono">0,5 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,5 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,2 pt</td>
-                                <td class="p-2.5 text-right font-bold text-indigo-600">1,2 pt</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 font-bold text-slate-800">Quesito 5</td>
-                                <td class="p-2.5">Intermedio-Avanzato (JOIN 3 Tab, Pattern e IS NOT NULL)</td>
-                                <td class="p-2.5 text-center font-mono">0,6 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,6 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,3 pt</td>
-                                <td class="p-2.5 text-right font-bold text-indigo-600">1,5 pt</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 font-bold text-slate-800">Quesito 6</td>
-                                <td class="p-2.5">Elevato (JOIN 4 Tabelle e Filtro Importo)</td>
+                                <td class="p-2.5">Intermedio (OUTER JOIN 2 Tab - Clienti Senza Fatture)</td>
+                                <td class="p-2.5 text-center font-mono">0,9 pt</td>
                                 <td class="p-2.5 text-center font-mono">0,8 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,8 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,4 pt</td>
+                                <td class="p-2.5 text-center font-mono">0,3 pt</td>
                                 <td class="p-2.5 text-right font-bold text-indigo-600">2,0 pt</td>
                             </tr>
                             <tr>
-                                <td class="p-2.5 font-bold text-slate-800">Quesito 7</td>
-                                <td class="p-2.5">Intermedio-Avanzato (LEFT JOIN 3 Tab e Consulente Nullo)</td>
-                                <td class="p-2.5 text-center font-mono">0,7 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,7 pt</td>
-                                <td class="p-2.5 text-center font-mono">0,2 pt</td>
-                                <td class="p-2.5 text-right font-bold text-indigo-600">1,6 pt</td>
+                                <td class="p-2.5 font-bold text-slate-800">Quesito 3</td>
+                                <td class="p-2.5">Elevato (JOIN 3 Tab con Filtri Multipli su Data e Città)</td>
+                                <td class="p-2.5 text-center font-mono">1,1 pt</td>
+                                <td class="p-2.5 text-center font-mono">1,0 pt</td>
+                                <td class="p-2.5 text-center font-mono">0,4 pt</td>
+                                <td class="p-2.5 text-right font-bold text-indigo-600">2,5 pt</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-slate-800">Quesito 4</td>
+                                <td class="p-2.5">Intermedio (OUTER JOIN 2 Tab - Pagamenti Inutilizzati)</td>
+                                <td class="p-2.5 text-center font-mono">0,9 pt</td>
+                                <td class="p-2.5 text-center font-mono">0,8 pt</td>
+                                <td class="p-2.5 text-center font-mono">0,3 pt</td>
+                                <td class="p-2.5 text-right font-bold text-indigo-600">2,0 pt</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-slate-800">Quesito 5</td>
+                                <td class="p-2.5">Intermedio (JOIN 2 Tab - Filtro Pattern Note)</td>
+                                <td class="p-2.5 text-center font-mono">0,9 pt</td>
+                                <td class="p-2.5 text-center font-mono">0,8 pt</td>
+                                <td class="p-2.5 text-center font-mono">0,3 pt</td>
+                                <td class="p-2.5 text-right font-bold text-indigo-600">2,0 pt</td>
                             </tr>
                         </tbody>
                         <tfoot>
@@ -302,6 +287,59 @@
                                 <td class="p-2.5 text-right text-sm">10,0 pt</td>
                             </tr>
                         </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tabella Livelli di Competenza -->
+            <div>
+                <h4 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2">2. Livelli di Competenza</h4>
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-[11px] border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 font-bold">
+                                <th class="p-2.5 border-b border-slate-200">Punteggio</th>
+                                <th class="p-2.5 border-b border-slate-200">Voto</th>
+                                <th class="p-2.5 border-b border-slate-200">Descrittore di Competenza</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-600">
+                            <tr>
+                                <td class="p-2.5 font-mono font-bold text-emerald-700">9,1 - 10,0 pt</td>
+                                <td class="p-2.5 font-bold text-slate-900">10 / Eccellente</td>
+                                <td class="p-2.5">Risolve con padronanza completa anche le query a 3 tabelle e con filtri logici complessi; sintassi SQL impeccabile.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-mono font-bold text-emerald-600">8,1 - 9,0 pt</td>
+                                <td class="p-2.5 font-bold text-slate-900">9 / Ottimo</td>
+                                <td class="p-2.5">Padroneggia le giunzioni esterne e multiple; commette solo imprecisioni veniali nell'ordinamento o negli alias.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-mono font-bold text-indigo-600">7,1 - 8,0 pt</td>
+                                <td class="p-2.5 font-bold text-slate-900">8 / Distinto</td>
+                                <td class="p-2.5">Buona impostazione delle query complesse; lievi incertezze sulla precedenza degli operatori logici o sui campi proiettati.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-mono font-bold text-amber-600">6,0 - 7,0 pt</td>
+                                <td class="p-2.5 font-bold text-slate-900">6-7 / Sufficiente</td>
+                                <td class="p-2.5">Gestisce correttamente le INNER JOIN a 2 tabelle e i filtri base; mostra qualche incertezza sulle LEFT JOIN o sulle giunzioni a 3 tabelle.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-mono font-bold text-orange-600">5,0 - 5,9 pt</td>
+                                <td class="p-2.5 font-bold text-slate-900">5 / Insufficiente</td>
+                                <td class="p-2.5">Incontra difficoltà nell'impostare le giunzioni multiple o nell'usare correttamente LEFT JOIN per rilevare l'assenza di dati.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-mono font-bold text-red-600">3,0 - 4,9 pt</td>
+                                <td class="p-2.5 font-bold text-slate-900">3-4 / Gravement. Insuff.</td>
+                                <td class="p-2.5">Difficoltà strutturali nell'individuare le tabelle coinvolte; errori frequenti nelle clausole ON e filtri assenti o errati.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-mono font-bold text-red-800">0,0 - 2,9 pt</td>
+                                <td class="p-2.5 font-bold text-slate-900">1-2 / Non Classificabile</td>
+                                <td class="p-2.5">Codice estremamente frammentario o prova non svolta.</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -352,9 +390,9 @@
             <div>
                 <div class="flex items-center gap-2">
                     <span class="bg-indigo-100 text-indigo-700 text-[10px] font-black px-2.5 py-0.5 rounded-md uppercase">Classe IV AFM</span>
-                    <span class="text-xs font-bold text-slate-400">Verifica Pratica SQL</span>
+                    <span class="text-xs font-bold text-slate-400">Prova Pratica / Laboratorio</span>
                 </div>
-                <h1 class="text-xl font-black text-slate-900 mt-1">Gestione Servizi Bancari e Finanziamenti <span class="text-indigo-600">(Fila A/D)</span></h1>
+                <h1 class="text-xl font-black text-slate-900 mt-1">Gestione Fatturazione <span class="text-indigo-600">(Fila A - 5 Quesiti)</span></h1>
                 <p id="header-student-display" class="text-xs font-bold text-indigo-800 mt-0.5 hidden">Studente: <span id="header-student-name">--</span></p>
             </div>
             
@@ -369,7 +407,7 @@
                 </button>
 
                 <button onclick="openSummaryModal()" class="text-[10px] font-bold bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-colors">
-                    📝 Riepilogo Risposte (<span id="answered-count-badge">0/7</span>)
+                    📝 Riepilogo Risposte (<span id="answered-count-badge">0/5</span>)
                 </button>
 
                 <div id="violation-badge" class="text-[10px] font-bold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg text-emerald-700 uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
@@ -384,7 +422,7 @@
             </div>
         </header>
 
-        <!-- Barra Navigazione Quesiti (1 to 7) -->
+        <!-- Barra Navigazione Quesiti (1 to 5) -->
         <div class="mb-4 bg-white border border-slate-200 rounded-xl p-2 shadow-sm flex items-center gap-2 overflow-x-auto">
             <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider px-2">Quesiti:</span>
             <div id="question-tabs-container" class="flex items-center gap-1.5 min-w-max">
@@ -402,22 +440,22 @@
                     <div class="flex justify-between items-start gap-2">
                         <div>
                             <span id="active-q-badge" class="text-[9px] font-bold uppercase tracking-wider bg-indigo-800 text-indigo-200 px-2 py-0.5 rounded border border-indigo-700">Quesito 1</span>
-                            <h2 id="active-q-title" class="text-sm font-black text-white mt-1">JOIN a 2 Tabelle e Filtro su Nome Filiale</h2>
+                            <h2 id="active-q-title" class="text-sm font-black text-white mt-1">JOIN a 2 Tabelle con Filtro e Ordinamento</h2>
                         </div>
-                        <span id="active-q-points" class="text-xs font-black bg-indigo-500/30 text-indigo-100 border border-indigo-400/30 px-2.5 py-1 rounded-lg">1.0 pt</span>
+                        <span id="active-q-points" class="text-xs font-black bg-indigo-500/30 text-indigo-100 border border-indigo-400/30 px-2.5 py-1 rounded-lg">1.5 pt</span>
                     </div>
 
                     <p id="active-q-text" class="text-xs text-indigo-100 leading-relaxed font-normal bg-indigo-950/50 p-3 rounded-lg border border-indigo-800/50">
-                        Selezionare il nome della filiale, la città della filiale, il cognome e il nome del consulente per le filiali il cui nome contenga il termine Centro o Est. Ordinare i risultati per cognome del consulente in ordine alfabetico.
+                        Estrarre la ragione sociale del cliente, la città, l'ID della fattura e la data della fattura per i clienti la cui ragione sociale contiene la parola Sistemi o Lombarda. Ordinare il risultato per data fattura dalla più recente alla meno recente (DECRESCENTE).
                     </p>
 
                     <div class="flex justify-between items-center text-[10px] text-indigo-300 pt-1 border-t border-indigo-800/60">
-                        <span>Punti: <strong text-white id="active-q-breakdown">JOIN 0.4 | WHERE 0.4 | SELECT 0.2</strong></span>
+                        <span>Punti: <strong class="text-white" id="active-q-breakdown">JOIN 0.7 | WHERE 0.6 | SELECT 0.2</strong></span>
                         <span id="active-q-saved-status" class="font-bold text-amber-300">⚪ Non ancora svolto</span>
                     </div>
                 </div>
 
-                <!-- Schema DB ERD -->
+                <!-- Schema DB ERD (Gestione Fatturazione) -->
                 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-center mb-2 px-1">
                         <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-400">SCHEMA DEL DATABASE (ERD)</h2>
@@ -429,61 +467,62 @@
                    
                     <div class="schema-diagram" id="diagram-container">
                         
-                        <!-- Tabella FILIALI -->
+                        <!-- Tabella CLIENTI_FAT -->
                         <div class="table-node" style="top: 15px; left: 15px;">
-                            <div class="table-header">FILIALI</div>
-                            <div class="table-body">
-                                <div class="column pk"><span>id_filiale <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔑</span></div>
-                                <div class="column"><span>nome_filiale <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
-                                <div class="column"><span>citta <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
-                                <div class="column"><span>responsabile <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
-                            </div>
-                        </div>
-
-                        <!-- Tabella CONSULENTI -->
-                        <div class="table-node" style="top: 15px; left: 240px;">
-                            <div class="table-header">CONSULENTI</div>
-                            <div class="table-body">
-                                <div class="column pk"><span>id_consulente <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔑</span></div>
-                                <div class="column fk"><span>id_filiale <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔗</span></div>
-                                <div class="column"><span>cognome <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
-                                <div class="column"><span>nome <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
-                                <div class="column"><span>email_aziendale <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
-                            </div>
-                        </div>
-
-                        <!-- Tabella CLIENTI_BANCA -->
-                        <div class="table-node" style="top: 250px; left: 15px;">
-                            <div class="table-header">CLIENTI_BANCA</div>
+                            <div class="table-header">CLIENTI_FAT</div>
                             <div class="table-body">
                                 <div class="column pk"><span>id_cliente <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔑</span></div>
                                 <div class="column"><span>ragione_sociale <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
-                                <div class="column"><span>partita_iva <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
                                 <div class="column"><span>citta <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
-                                <div class="column"><span>telefono <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
+                                <div class="column"><span>email <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
+                                <div class="column"><span>partita_iva <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
                             </div>
                         </div>
 
-                        <!-- Tabella FINANZIAMENTI -->
-                        <div class="table-node" style="top: 220px; left: 240px;">
-                            <div class="table-header">FINANZIAMENTI</div>
+                        <!-- Tabella MODALITA_PAGAMENTO -->
+                        <div class="table-node" style="top: 15px; left: 235px;">
+                            <div class="table-header">MODALITA_PAGAMENTO</div>
                             <div class="table-body">
-                                <div class="column pk"><span>id_finanziamento <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔑</span></div>
+                                <div class="column pk"><span>id_modalita <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔑</span></div>
+                                <div class="column"><span>descrizione_pagamento <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
+                                <div class="column"><span>giorni_dilazione <span class="text-[8px] text-slate-400">INT</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Tabella FATTURE -->
+                        <div class="table-node" style="top: 195px; left: 125px;">
+                            <div class="table-header">FATTURE</div>
+                            <div class="table-body">
+                                <div class="column pk"><span>id_fattura <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔑</span></div>
+                                <div class="column"><span>data_fattura <span class="text-[8px] text-slate-400">DATE</span></span></div>
                                 <div class="column fk"><span>id_cliente <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔗</span></div>
-                                <div class="column fk"><span>id_consulente <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔗</span></div>
-                                <div class="column"><span>importo_concesso <span class="text-[8px] text-slate-400">DECIMAL</span></span></div>
-                                <div class="column"><span>data_erogazione <span class="text-[8px] text-slate-400">DATE</span></span></div>
-                                <div class="column"><span>durata_mesi <span class="text-[8px] text-slate-400">INT</span></span></div>
-                                <div class="column"><span>tasso_interesse <span class="text-[8px] text-slate-400">DECIMAL</span></span></div>
-                                <div class="column"><span>note <span class="text-[8px] text-slate-400">TEXT</span></span></div>
+                                <div class="column fk"><span>id_modalita <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔗</span></div>
+                                <div class="column"><span>note_fattura <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Tabella DETTAGLI_FATTURA -->
+                        <div class="table-node" style="top: 365px; left: 125px;">
+                            <div class="table-header">DETTAGLI_FATTURA</div>
+                            <div class="table-body">
+                                <div class="column pk fk"><span>id_fattura <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔑🔗</span></div>
+                                <div class="column pk"><span>numero_riga <span class="text-[8px] opacity-75 font-normal">INT</span></span> <span>🔑</span></div>
+                                <div class="column"><span>descrizione_prestazione <span class="text-[8px] text-slate-400">VARCHAR</span></span></div>
+                                <div class="column"><span>quantita <span class="text-[8px] text-slate-400">INT</span></span></div>
+                                <div class="column"><span>prezzo_unitario <span class="text-[8px] text-slate-400">DECIMAL</span></span></div>
                             </div>
                         </div>
 
                         <!-- Connessioni SVG ERD -->
                         <svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
-                            <line x1="190" y1="38" x2="240" y2="58" class="conn-line" />
-                            <line x1="190" y1="275" x2="240" y2="260" class="conn-line" />
-                            <line x1="325" y1="130" x2="325" y2="220" class="conn-line" />
+                            <!-- Connessione CLIENTI_FAT (id_cliente) -> FATTURE (id_cliente) -->
+                            <line x1="107" y1="135" x2="150" y2="195" class="conn-line" />
+                            
+                            <!-- Connessione MODALITA_PAGAMENTO (id_modalita) -> FATTURE (id_modalita) -->
+                            <line x1="327" y1="110" x2="280" y2="195" class="conn-line" />
+                            
+                            <!-- Connessione FATTURE (id_fattura) -> DETTAGLI_FATTURA (id_fattura) -->
+                            <line x1="217" y1="315" x2="217" y2="365" class="conn-line" />
                         </svg>
 
                     </div>
@@ -571,7 +610,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Classe / Materia</label>
-                        <input type="text" id="student-class-input" oninput="updateReportPreview()" value="IV AFM - Informatica" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-indigo-600">
+                        <input type="text" id="student-class-input" oninput="updateReportPreview()" value="IV AFM - Gestione Fatturazione (Fila A)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-indigo-600">
                     </div>
                 </div>
 
@@ -613,19 +652,15 @@
     </div>
 
     <script>
-        const GITHUB_DB_URL = "https://github.com/vairamichele-wq/Database/blob/main/Verifica6.db";
+        const GITHUB_DB_URL = "https://github.com/vairamichele-wq/Database/blob/main/Verifica4.db";
         const TEACHER_PIN = "1231"; // PIN per lo sblocco docente
         
         // ================= GESTIONE SESSIONE / CLASSE =================
-        // Modifica questa stringa per cambiare sessione/classe a livello di codice, 
-        // oppure invia agli studenti un link con ?sessione=NOME_CLASSE
-        const DEFAULT_EXAM_SESSION_ID = "4AFM_VERIFICA_1"; 
+        const DEFAULT_EXAM_SESSION_ID = "4AFM_VERIFICA_FATTURAZIONE_FILA_A"; 
 
-        // Rileva automaticamente l'ID sessione dall'URL (es. ...index.html?sessione=4BFM) oppure usa il default
         const urlParams = new URLSearchParams(window.location.search);
         const CURRENT_SESSION_ID = urlParams.get('sessione') || urlParams.get('session') || DEFAULT_EXAM_SESSION_ID;
 
-        // La chiave di memoria locale dipenderà unicamente dalla sessione corrente
         const STORAGE_KEY = `SQL_EXAM_PERSISTENT_STATE_${CURRENT_SESSION_ID.toUpperCase()}`;
         
         let db;
@@ -642,69 +677,51 @@
             }
         }
 
-        // Struttura Dati dei 7 Quesiti della Verifica
+        // Struttura Dati dei 5 Quesiti della Verifica Gestione Fatturazione (Fila A)
         const questionsData = [
             {
                 id: 1,
-                title: "JOIN a 2 Tabelle e Filtro su Nome Filiale",
+                title: "JOIN a 2 Tabelle con Filtro e Ordinamento",
                 level: "Base-Intermedio",
-                pointsTotal: "1.0 pt",
-                breakdown: "JOIN 0.4 | WHERE 0.4 | SELECT 0.2",
-                text: "Selezionare il nome della filiale, la città della filiale, il cognome e il nome del consulente per le filiali il cui nome contenga il termine Centro o Est. Ordinare i risultati per cognome del consulente in ordine alfabetico.",
+                pointsTotal: "1,5 pt",
+                breakdown: "JOIN 0,7 | WHERE 0,6 | SELECT 0,2",
+                text: "Seleziona la ragione sociale del cliente, la città, l'ID della fattura e la data della fattura per i clienti dove la ragione sociale contiene la parola Sistemi o Lombarda. Ordinare il risultato per data fattura dalla più recente alla meno recente (DECRESCENTE).",
                 userQuery: ""
             },
             {
                 id: 2,
-                title: "OUTER JOIN a 2 Tabelle e Clienti Senza Finanziamenti",
+                title: "OUTER JOIN a 2 Tabelle e Clienti Senza Fatture",
                 level: "Intermedio",
-                pointsTotal: "1.2 pt",
-                breakdown: "JOIN 0.5 | WHERE 0.5 | SELECT 0.2",
-                text: "L'ufficio crediti intende rilevare i clienti dell'istituto bancario che non hanno attualmente alcun finanziamento erogato. Scrivere la query tramite LEFT JOIN tra CLIENTI_BANCA e FINANZIAMENTI che mostri ragione sociale e città di tali clienti.",
+                pointsTotal: "2,0 pt",
+                breakdown: "JOIN 0,9 | WHERE 0,8 | SELECT 0,3",
+                text: "Scrivere una query per selezionare la ragione sociale, città e partita IVA dei clienti che non hanno fatture.",
                 userQuery: ""
             },
             {
                 id: 3,
-                title: "JOIN a 3 Tabelle con Range e Filtro Città",
-                level: "Intermedio-Avanzato",
-                pointsTotal: "1.5 pt",
-                breakdown: "JOIN 0.6 | WHERE 0.6 | SELECT 0.3",
-                text: "Estrarre l'ID del finanziamento, la data di erogazione, la ragione sociale del cliente e il cognome del consulente per i finanziamenti erogati nel periodo dopo il 2024-01-01 a clienti con sede nelle città di Monza o Brescia.",
+                title: "JOIN a 3 Tabelle con Filtri Multipli",
+                level: "Elevato",
+                pointsTotal: "2,5 pt",
+                breakdown: "JOIN 1,1 | WHERE 1,0 | SELECT 0,4",
+                text: "Selezionare l'ID fattura, la data fattura, la ragione sociale del cliente e la descrizione della modalità di pagamento dove la data della fattura sia dopo il 2024-02-01 (>=) e la città del cliente sia Milano o Verona.",
                 userQuery: ""
             },
             {
                 id: 4,
-                title: "OUTER JOIN a 2 Tabelle su Filiali e Valori Nulli",
+                title: "OUTER JOIN a 2 Tabelle su Modalità di Pagamento Inutilizzate",
                 level: "Intermedio",
-                pointsTotal: "1.2 pt",
-                breakdown: "JOIN 0.5 | WHERE 0.5 | SELECT 0.2",
-                text: "Mostrare l'elenco di tutte le filiali presenti nel sistema (nome filiale, città e responsabile) e i cognomi degli eventuali consulenti a esse assegnati, includendo anche le filiali che non hanno alcun consulente associato. Ordinare per città in ordine alfabetico.",
+                pointsTotal: "2,0 pt",
+                breakdown: "JOIN 0,9 | WHERE 0,8 | SELECT 0,3",
+                text: "Seleziona la descrizione e i giorni di dilazione delle modalità di pagamento e gli eventuali ID fattura ad esse associati, includendo anche le modalità di pagamento mai utilizzate in alcuna fattura. Ordinare per descrizione della modalità in ordine alfabetico.",
                 userQuery: ""
             },
             {
                 id: 5,
-                title: "JOIN a 3 Tabelle con Pattern Matching e Email Non Nulle",
-                level: "Intermedio-Avanzato",
-                pointsTotal: "1.5 pt",
-                breakdown: "JOIN 0.6 | WHERE 0.6 | SELECT 0.3",
-                text: "Visualizzare l'ID del finanziamento, la data di erogazione, la ragione sociale del cliente e il testo delle note per i finanziamenti la cui nota contenga la parola garantito o preattivazione e il cui consulente possieda un'email aziendale censita (IS NOT NULL).",
-                userQuery: ""
-            },
-            {
-                id: 6,
-                title: "JOIN a 4 Tabelle con Filtro su Importo Concesso",
-                level: "Elevato",
-                pointsTotal: "2.0 pt",
-                breakdown: "JOIN 0.8 | WHERE 0.8 | SELECT 0.4",
-                text: "Estrarre la ragione sociale del cliente, la città del cliente, il cognome del consulente, il nome della filiale e l'importo concesso per tutti i finanziamenti con un importo superiore o uguale a 50.000,00 €.",
-                userQuery: ""
-            },
-            {
-                id: 7,
-                title: "OUTER JOIN a 3 Tabelle e Finanziamenti Senza Consulente",
-                level: "Intermedio-Avanzato",
-                pointsTotal: "1.6 pt",
-                breakdown: "JOIN 0.7 | WHERE 0.7 | SELECT 0.2",
-                text: "Mostrare l'ID del finanziamento, la data di erogazione, la ragione sociale del cliente e il cognome del consulente (che risulterà nullo) per tutti i finanziamenti gestiti direttamente dalla direzione e privi del consulente (id_consulente nullo nella tabella FINANZIAMENTI).",
+                title: "JOIN a 2 Tabelle con Filtro",
+                level: "Intermedio",
+                pointsTotal: "2,0 pt",
+                breakdown: "JOIN 0,9 | WHERE 0,8 | SELECT 0,3",
+                text: "Selezionare l'ID fattura, la data fattura, la ragione sociale del cliente e le note della fattura dove il testo delle note delle fatture contenga la parola sollecito o acconto.",
                 userQuery: ""
             }
         ];
@@ -913,7 +930,7 @@
 
         function showWarningModal(reason) {
             isModalOpen = true;
-            mainAppContainer.classList.add('hidden'); // Assicura che l'interfaccia sia completamente nascosta
+            mainAppContainer.classList.add('hidden');
             warningReasonText.innerText = reason;
             warningCountDisplay.innerText = `${violationCount} / ${MAX_VIOLATIONS}`;
             warningModal.classList.remove('hidden');
@@ -923,12 +940,11 @@
             isModalOpen = false;
             warningModal.classList.add('hidden');
             
-            // Forzatura sempre attiva del fullscreen alla pressione del pulsante
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen().catch(() => {});
             }
 
-            mainAppContainer.classList.remove('hidden'); // Rivela l'interfaccia solo dopo la riattivazione
+            mainAppContainer.classList.remove('hidden');
             
             if (editorCM) {
                 setTimeout(() => editorCM.refresh(), 100);
@@ -941,7 +957,7 @@
 
             warningModal.classList.add('hidden');
             startModal.classList.add('hidden');
-            mainAppContainer.classList.add('hidden'); // Interfaccia totalmente nascosta
+            mainAppContainer.classList.add('hidden');
             lockoutModal.classList.remove('hidden');
             
             violationLogList.innerHTML = violationLogs.map(log => `<div>• ${log}</div>`).join('');
@@ -1121,7 +1137,7 @@
 
         function updateAnsweredBadgeCount() {
             const count = questionsData.filter(q => q.userQuery.trim().length > 0).length;
-            document.getElementById('answered-count-badge').innerText = `${count}/7`;
+            document.getElementById('answered-count-badge').innerText = `${count}/5`;
         }
 
         // ================= MODALI GRIGLIA E RIEPILOGI =================
@@ -1183,7 +1199,7 @@
 
         function generatePlainTextReport() {
             const studentName = document.getElementById('student-name-input').value.trim() || '[Nome e Cognome Studente]';
-            const studentClass = document.getElementById('student-class-input').value.trim() || 'IV AFM - Informatica';
+            const studentClass = document.getElementById('student-class-input').value.trim() || 'IV AFM - Gestione Fatturazione (Fila A)';
             const studentNotes = document.getElementById('student-notes-input').value.trim();
 
             const now = new Date();
@@ -1197,7 +1213,7 @@
             report += `STUDENTE: ${studentName}\n`;
             report += `CLASSE / MATERIA: ${studentClass}\n`;
             report += `DATA E ORA: ${formattedDate} - ${formattedTime}\n`;
-            report += `QUESITI COMPLETATI: ${answeredCount} su 7\n`;
+            report += `QUESITI COMPLETATI: ${answeredCount} su 5\n`;
             report += `STATO SICUREZZA: ${violationCount === 0 ? 'REGOLARE (0 anomalie)' : `ANOMALIE RILEVATE (${violationCount}/3)`}\n`;
             if (studentNotes) {
                 report += `NOTE STUDENTE: ${studentNotes}\n`;
