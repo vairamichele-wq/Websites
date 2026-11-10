@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Master - Funzioni di Aggregazione (Versione Facilitata - 5 Quesiti)</title>
+    <title>SQL Master - Funzioni di Aggregazione (Versione con - 5 Quesiti)</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -116,7 +116,7 @@
             <div>
                 <h2 class="text-2xl font-black text-slate-900">Modalità Verifica Protetta</h2>
                 <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Verifica Pratica di Informatica (Classe IV AFM) - Logistica Pacchi <strong class="text-indigo-600">(Versione Facilitata - 5 Quesiti)</strong>
+                    Verifica Pratica di Informatica (Classe IV AFM) - Logistica Pacchi <strong class="text-indigo-600">(Versione con - 5 Quesiti)</strong>
                 </p>
             </div>
 
@@ -225,7 +225,7 @@
             </div>
 
             <div>
-                <h4 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2">1. Ripartizione Punteggi per Quesito (Versione Facilitata - Spedizioni)</h4>
+                <h4 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2">1. Ripartizione Punteggi per Quesito (Versione con - Spedizioni)</h4>
                 <div class="overflow-x-auto border border-slate-200 rounded-xl">
                     <table class="w-full text-left text-[11px] border-collapse">
                         <thead>
@@ -338,7 +338,7 @@
                     <span class="bg-indigo-100 text-indigo-700 text-[10px] font-black px-2.5 py-0.5 rounded-md uppercase">Classe IV AFM</span>
                     <span class="text-xs font-bold text-slate-400">Verifica Pratica SQL</span>
                 </div>
-                <h1 class="text-xl font-black text-slate-900 mt-1">Gestione Spedizioni e Logistica Pacchi <span class="text-indigo-600">(Versione Facilitata - 5 Quesiti)</span></h1>
+                <h1 class="text-xl font-black text-slate-900 mt-1">Gestione Spedizioni e Logistica Pacchi <span class="text-indigo-600">(Versione con - 5 Quesiti)</span></h1>
                 <p id="header-student-display" class="text-xs font-bold text-indigo-800 mt-0.5 hidden">Studente: <span id="header-student-name">--</span></p>
             </div>
             
@@ -600,7 +600,7 @@
         const TEACHER_PIN = "1231"; // PIN per lo sblocco docente
         
         // ================= GESTIONE SESSIONE / CLASSE =================
-        const DEFAULT_EXAM_SESSION_ID = "4AFM_VERIFICA_SPEDIZIONI_FACILITATA"; 
+        const DEFAULT_EXAM_SESSION_ID = "4AFM_VERIFICA_SPEDIZIONI_con"; 
 
         const urlParams = new URLSearchParams(window.location.search);
         const CURRENT_SESSION_ID = urlParams.get('sessione') || urlParams.get('session') || DEFAULT_EXAM_SESSION_ID;
@@ -621,7 +621,7 @@
             }
         }
 
-        // Struttura Dati dei 5 Quesiti della Verifica Facilitata (Spedizioni e Pacchi)
+        // Struttura Dati dei 5 Quesiti della Verifica con (Spedizioni e Pacchi)
         const questionsData = [
             {
                 id: 1,
@@ -1149,7 +1149,7 @@
             const answeredCount = questionsData.filter(q => q.userQuery.trim().length > 0).length;
 
             let report = `=====================================================\n`;
-            report += `  RELAZIONE VERIFICA PRATICA SQL (VERS. FACILITATA)  \n`;
+            report += `  RELAZIONE VERIFICA PRATICA SQL (VERS. con)  \n`;
             report += `=====================================================\n\n`;
             report += `STUDENTE: ${studentName}\n`;
             report += `CLASSE / MATERIA: ${studentClass}\n`;
